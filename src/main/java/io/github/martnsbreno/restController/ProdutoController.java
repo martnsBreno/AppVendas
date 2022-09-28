@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -29,12 +30,12 @@ public class ProdutoController {
     }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    private Produto save (@RequestBody Produto produto) {
+    private Produto save ( @Valid @RequestBody Produto produto) {
         return repository.save(produto);
     }
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update (@PathVariable Integer id, @RequestBody Produto produto) {
+    public void update ( @Valid @PathVariable Integer id, @RequestBody Produto produto) {
         Optional<Produto> produto1 = repository.findById(id);
         if (produto1.isPresent()) {
             produto.setId(produto1.get().getId());

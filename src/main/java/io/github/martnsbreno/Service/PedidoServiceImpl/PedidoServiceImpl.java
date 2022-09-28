@@ -9,6 +9,8 @@ import io.github.martnsbreno.domain.entity.repository.Clientes;
 import io.github.martnsbreno.domain.entity.repository.ItemsPedido;
 import io.github.martnsbreno.domain.entity.repository.Pedidos;
 import io.github.martnsbreno.domain.entity.repository.Produtos;
+import io.github.martnsbreno.domain.enums.StatusPedido;
+import io.github.martnsbreno.exception.PedidoNaoEncontradoException.PedidoNaoEncontradoException;
 import io.github.martnsbreno.exception.RegraNegocioException;
 import io.github.martnsbreno.restController.dto.ItemPedidoDto;
 import io.github.martnsbreno.restController.dto.PedidoDTO;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,12 +43,27 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setTotal(dto.getTotal());
         pedido.setDataPedido(LocalDate.now());
         pedido.setCliente(cliente);
+        pedido.setStatusPedido(StatusPedido.REALIZADO);
 
         List<ItemPedido> itemPedido = converterItems(pedido, dto.getItems());
         repository.save(pedido);
         itemsPedidos.saveAll(itemPedido);
         pedido.setItens(itemPedido);
         return pedido;
+    }
+
+    @Override
+    public Optional<Pedido> obterPedidoCompleto(Integer id) {
+        return repository.findByIdFetchItens(id);
+    }
+
+    @Override
+    @Transactional
+    public void atualizaStatus(Integer id, StatusPedido statusPedido) {
+        repository.findById(id).map(pedido -> {
+            pedido.setStatusPedido(statusPedido);
+            return repository.save(pedido);
+        }).orElseThrow(() -> new PedidoNaoEncontradoException());
     }
 
     private List<ItemPedido> converterItems(Pedido pedido, List<ItemPedidoDto> items) {
