@@ -2,7 +2,7 @@ package io.github.martnsbreno.Service;
 
 import io.github.martnsbreno.domain.entity.Pedido;
 import io.github.martnsbreno.domain.enums.StatusPedido;
-import io.github.martnsbreno.restController.dto.PedidoDTO;
+import io.github.martnsbreno.domain.dto.PedidoDTO;
 
 import java.util.Optional;
 
